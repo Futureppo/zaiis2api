@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     PROJECT_NAME: str = "zai.is2api"
     API_V1_STR: str = "/v1"
+    ADMIN_API_KEY: str = ""
     
     # Database
     DATABASE_URL: str = "sqlite+aiosqlite:///./data/zai_gateway.db"

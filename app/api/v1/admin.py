@@ -1,4 +1,6 @@
-from typing import Any, Dict
+import hashlib
+import hmac
+from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Body, Response, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc, or_, delete
@@ -14,10 +16,30 @@ router = APIRouter()
 
 # --- Auth ---
 
+SESSION_SALT = b"admin-session"
+
+def _get_admin_session_token() -> str:
+    if not settings.ADMIN_API_KEY:
+        raise HTTPException(status_code=500, detail="Admin key not configured")
+    return hmac.new(
+        settings.ADMIN_API_KEY.encode("utf-8"),
+        SESSION_SALT,
+        hashlib.sha256,
+    ).hexdigest()
+
 @router.post("/login")
 async def login(response: Response, password: str = Body(..., embed=True)):
-    if password == "admin": # Default hardcoded password
-        response.set_cookie(key="admin_session", value="authenticated", httponly=True)
+    expected = settings.ADMIN_API_KEY
+    if not expected:
+        raise HTTPException(status_code=500, detail="Admin key not configured")
+    if password == expected:
+        session_token = _get_admin_session_token()
+        response.set_cookie(
+            key="admin_session",
+            value=session_token,
+            httponly=True,
+            samesite="lax",
+        )
         return {"status": "success"}
     raise HTTPException(status_code=401, detail="Invalid password")
 
@@ -27,7 +49,10 @@ async def logout(response: Response):
     return {"status": "success"}
 
 async def verify_admin(admin_session: str | None = Cookie(None)):
-    if admin_session != "authenticated":
+    if not admin_session:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    expected_token = _get_admin_session_token()
+    if not hmac.compare_digest(admin_session, expected_token):
         raise HTTPException(status_code=401, detail="Not authenticated")
 
 # --- Stats ---
@@ -35,15 +60,13 @@ async def verify_admin(admin_session: str | None = Cookie(None)):
 @router.get("/stats", dependencies=[Depends(verify_admin)])
 async def get_stats(db: AsyncSession = Depends(get_db)):
     account_count = await db.scalar(select(func.count(Account.id)))
-    active_account_count = await db.scalar(select(func.count(Account.id)).where(Account.is_active == True))
+    active_account_count = await db.scalar(select(func.count(Account.id)).where(Account.is_active))
     request_count = await db.scalar(select(func.count(RequestLog.id)))
     
     redis = await get_redis()
-    # Simple estimation of zai tokens (scan might be slow if many keys, but here likely few)
-    # Using keys is blocking, but for admin panel with low load it's acceptable for now.
-    # A better way is to maintain a set of tokens.
-    keys = await redis.keys("zai:token:*")
-    active_tokens = len(keys)
+    active_tokens = 0
+    async for _ in redis.scan_iter(match="zai:token:*", count=100):
+        active_tokens += 1
     
     return {
         "total_accounts": account_count,
@@ -103,7 +126,7 @@ async def clear_logs(db: AsyncSession = Depends(get_db)):
 async def get_config():
     return {
         "PROJECT_NAME": settings.PROJECT_NAME,
-        "DATABASE_URL": settings.DATABASE_URL, # Mask if sensitive
+        "DATABASE_URL": settings.DATABASE_URL,
         "ZAI_BASE_URL": settings.ZAI_BASE_URL,
         "TOKEN_REFRESH_INTERVAL": settings.TOKEN_REFRESH_INTERVAL,
         "ZAI_TOKEN_TTL": settings.ZAI_TOKEN_TTL
@@ -114,12 +137,11 @@ async def get_config():
 @router.get("/zai-tokens", dependencies=[Depends(verify_admin)])
 async def get_zai_tokens():
     redis = await get_redis()
-    keys = await redis.keys("zai:token:*")
     tokens = []
-    for k in keys:
-        ttl = await redis.ttl(k)
+    async for key in redis.scan_iter(match="zai:token:*", count=100):
+        ttl = await redis.ttl(key)
         tokens.append({
-            "key": k.decode("utf-8"),
+            "key": key,
             "ttl": ttl
         })
     return tokens
