@@ -1,5 +1,6 @@
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
 from contextlib import asynccontextmanager
 
 from app.core.config import settings
@@ -7,6 +8,9 @@ from app.db.session import engine, Base
 from app.workers.refresh_task import start_scheduler, scheduler
 from app.api.v1 import chat, admin
 from app.services.zai_client import ZaiClient
+# Import models to register them with Base
+from app.models.account import Account
+from app.models.log import RequestLog
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -35,8 +39,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+templates = Jinja2Templates(directory="app/templates")
+
 app.include_router(chat.router, prefix=settings.API_V1_STR, tags=["chat"])
 app.include_router(admin.router, prefix=settings.API_V1_STR, tags=["admin"])
+
+@app.get("/", include_in_schema=False)
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/health")
 async def health_check():

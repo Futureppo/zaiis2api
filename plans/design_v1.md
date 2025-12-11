@@ -133,8 +133,34 @@ zai.is2api/
 └── requirements.txt
 ```
 
-## 6. 下一步行动 (Next Steps)
+## 6. WebUI 设计 (WebUI Design)
+
+为了方便管理账号和监控系统状态，系统集成了一个轻量级的 Web 管理界面。
+
+### 6.1 页面功能
+1.  **Dashboard (仪表盘)**:
+    *   查看当前系统状态 (Redis 连接状态、Worker 状态)。
+    *   统计信息 (活跃账号数、今日请求数等)。
+2.  **Account Management (账号管理)**:
+    *   添加新的 Discord Token。
+    *   查看账号列表 (ID, 状态, 最后错误信息)。
+    *   删除/禁用账号。
+    *   手动触发 Token 刷新。
+3.  **Chat Playground (对话测试)**:
+    *   一个简易的聊天界面，直接调用 `/v1/chat/completions` 接口测试可用性。
+
+### 6.2 技术选型
+*   **Frontend**: HTML5 + TailwindCSS (CDN) + Alpine.js (CDN) - 纯静态单页应用，无构建步骤。
+*   **Backend Serving**: FastAPI `StaticFiles` 挂载。
+*   **Templates**: Jinja2 (用于注入初始配置，如 API Base URL)。
+
+### 6.3 路由
+*   `GET /`: 主界面 (Dashboard)。
+*   `GET /ui/static/{path}`: 静态资源 (CSS/JS)。
+
+## 7. 下一步行动 (Next Steps)
 
 1.  确认以上设计是否符合需求。
 2.  开始搭建项目骨架。
 3.  优先实现 `Token Manager` 和后台刷新机制。
+4.  开发 WebUI 并集成。
