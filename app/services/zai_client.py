@@ -148,31 +148,31 @@ class ZaiClient:
                     error_text = error_bytes.decode('utf-8', errors='ignore')
                     logger.error(f"Zai API Error: {response.status_code} - {error_text}")
                     if response.status_code == 401:
-                            raise ZaiAuthError("401 Unauthorized")
+                        raise ZaiAuthError("401 Unauthorized")
                     raise ZaiAPIError(response.status_code, error_text)
 
                 async for line in response.aiter_lines():
-                        if not line:
-                            continue
-                        
-                        if line.startswith("data: "):
-                            data_str = line[6:]
-                            if data_str == "[DONE]":
-                                break
-                            try:
-                                data = json.loads(data_str)
-                                # Zai format usually sends partial content or updates
-                                # We need to check actual response format. 
-                                # Based on typical SSE, we expect content deltas.
-                                # Assuming OpenWebUI format:
-                                # {"token": "...", "content": "...", "done": false}
-                                
-                                # Let's assume standard 'content' field in data
-                                content = data.get("content", "") or data.get("token", "")
-                                if content:
-                                    yield content
-                            except json.JSONDecodeError:
-                                pass
-            except Exception as e:
-                logger.error(f"Stream error: {e}")
-                raise e
+                    if not line:
+                        continue
+                    
+                    if line.startswith("data: "):
+                        data_str = line[6:]
+                        if data_str == "[DONE]":
+                            break
+                        try:
+                            data = json.loads(data_str)
+                            # Zai format usually sends partial content or updates
+                            # We need to check actual response format. 
+                            # Based on typical SSE, we expect content deltas.
+                            # Assuming OpenWebUI format:
+                            # {"token": "...", "content": "...", "done": false}
+                            
+                            # Let's assume standard 'content' field in data
+                            content = data.get("content", "") or data.get("token", "")
+                            if content:
+                                yield content
+                        except json.JSONDecodeError:
+                            pass
+        except Exception as e:
+            logger.error(f"Stream error: {e}")
+            raise e
