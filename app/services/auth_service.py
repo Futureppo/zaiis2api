@@ -10,6 +10,7 @@ async def login_with_discord_token(discord_token: str) -> Dict[str, Any]:
     Asynchronously exchange Discord Token for Zai Access Token.
     """
     def _login():
+        # Use the updated DiscordOAuthHandler which returns dict with 'token'
         handler = DiscordOAuthHandler()
         return handler.backend_login(discord_token)
     

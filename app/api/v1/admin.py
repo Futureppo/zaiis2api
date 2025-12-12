@@ -171,6 +171,7 @@ class ConfigUpdate(BaseModel):
 
 @router.post("/config", dependencies=[Depends(verify_admin)])
 async def update_config(config: ConfigUpdate, db: AsyncSession = Depends(get_db)):
+    # Update retry_count
     stmt = select(SystemConfig).where(SystemConfig.key == "retry_count")
     result = await db.execute(stmt)
     sys_config = result.scalar_one_or_none()
@@ -182,7 +183,10 @@ async def update_config(config: ConfigUpdate, db: AsyncSession = Depends(get_db)
         db.add(sys_config)
     
     await db.commit()
-    return {"retry_count": config.retry_count}
+    
+    # Re-fetch full config to return
+    current_config = await get_config(db)
+    return current_config
 
 @router.get("/config", dependencies=[Depends(verify_admin)])
 async def get_config(db: AsyncSession = Depends(get_db)):

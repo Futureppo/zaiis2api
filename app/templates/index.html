@@ -331,14 +331,39 @@
                         <!-- Config -->
                         <div x-show="currentTab === 'config'">
                              <div class="bg-white shadow sm:rounded-lg p-6">
-                                <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-                                    <template x-for="(value, key) in config" :key="key">
-                                        <div class="sm:col-span-1">
-                                            <dt class="text-sm font-medium text-gray-500" x-text="key"></dt>
-                                            <dd class="mt-1 text-sm text-gray-900" x-text="value"></dd>
+                                <form @submit.prevent="updateConfig">
+                                    <div class="space-y-6">
+                                        <div>
+                                            <h3 class="text-lg leading-6 font-medium text-gray-900">System Configuration</h3>
+                                            <p class="mt-1 max-w-2xl text-sm text-gray-500">Manage system-wide settings.</p>
                                         </div>
-                                    </template>
-                                </dl>
+                                        
+                                        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                                            <div class="sm:col-span-3">
+                                                <label for="retry_count" class="block text-sm font-medium text-gray-700">Retry Count</label>
+                                                <div class="mt-1">
+                                                    <input type="number" name="retry_count" id="retry_count" x-model="config.retry_count" min="0" max="10"
+                                                           class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md border p-2">
+                                                    <p class="mt-1 text-xs text-gray-500">Number of retries for failed Zai API requests (0-10).</p>
+                                                </div>
+                                            </div>
+
+                                            <!-- Add other config fields here as needed -->
+                                            <template x-for="(value, key) in config" :key="key">
+                                                <div class="sm:col-span-6" x-show="key !== 'retry_count'">
+                                                    <dt class="text-sm font-medium text-gray-500" x-text="key"></dt>
+                                                    <dd class="mt-1 text-sm text-gray-900" x-text="value"></dd>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                                Save Config
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                              </div>
                         </div>
 

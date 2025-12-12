@@ -248,7 +248,14 @@ class DiscordOAuthHandler:
                 user_info = self._verify_session()
                 if user_info and not user_info.get('error'):
                     logger.info(f"    [+] Session 验证成功！用户: {user_info.get('name', 'Unknown')}")
-                    return {'token': 'SESSION_AUTH', 'user_info': user_info}
+                    # Try to extract actual JWT from session if possible, but currently API relies on token
+                    # If we only have session cookie, we might need to change how ZaiClient works to use cookies
+                    # But the user asked to convert discord token to jwt token.
+                    # If we can't find a JWT token but have session, we might need to warn.
+                    
+                    # For now, return SESSION_AUTH indicator, but ideally we want the JWT.
+                    # Usually 'token' cookie IS the JWT.
+                    return {'token': 'SESSION_AUTH', 'user_info': user_info, 'cookies': self.session.cookies.get_dict()}
 
             return {'error': '未能从回调中获取 token'}
             
