@@ -54,39 +54,6 @@ docker-compose up --build -d
 
 打开浏览器访问 `http://localhost:8000`，使用默认密码 `114514` 登录管理界面。
 
-### 6. 添加账号
-
-在管理界面中添加 Discord Token，或使用 API：
-
-```bash
-curl -X POST "http://localhost:8000/v1/accounts" \
-     -H "Content-Type: application/json" \
-     -d '{"discord_token": "YOUR_DISCORD_TOKEN"}'
-```
-
-### 7. 创建 API 密钥
-
-在管理界面中创建 API 密钥，或使用 API：
-
-```bash
-curl -X POST "http://localhost:8000/v1/api-keys" \
-     -H "Content-Type: application/json" \
-     -d '{"name": "my-key"}'
-```
-
-### 8. 调用对话接口
-
-```bash
-curl -X POST "http://localhost:8000/v1/chat/completions" \
-     -H "Authorization: Bearer sk-zai-YOUR_API_KEY" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "model": "gemini-3-pro-image-preview",
-       "messages": [{"role": "user", "content": "Hello!"}],
-       "stream": true
-     }'
-```
-
 ## API 接口文档
 
 项目提供完整的 OpenAPI 文档：
