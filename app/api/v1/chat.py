@@ -125,11 +125,15 @@ async def list_models(
             # Check structure of m. If it's a string, use it. If dict, find ID.
             model_id = m.get("id") if isinstance(m, dict) else str(m)
             # zai api returns list of model objects
+            # Some platforms like New API might expect 'permission' field or specific 'owned_by'
             openai_models.append({
                 "id": model_id,
                 "object": "model",
                 "created": int(time.time()),
-                "owned_by": "zai"
+                "owned_by": "zai",
+                "permission": [],
+                "root": model_id,
+                "parent": None
             })
             
         return {"object": "list", "data": openai_models}
