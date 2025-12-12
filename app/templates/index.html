@@ -516,6 +516,45 @@
                 async fetchConfig() {
                     const res = await fetch(`${this.apiBase}/config`);
                     if (res.ok) this.config = await res.json();
+                },
+
+                async updateConfig() {
+                    const res = await fetch(`${this.apiBase}/config`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ retry_count: parseInt(this.config.retry_count) })
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        // Update local config to reflect changes
+                        this.config.retry_count = data.retry_count;
+                        alert("配置已保存");
+                    } else {
+                        alert("保存失败");
+                    }
+                },
+
+                async fetchApiKeys() {
+                    const res = await fetch(`${this.apiBase}/api-keys`);
+                    if (res.ok) this.apiKeys = await res.json();
+                },
+
+                async createApiKey() {
+                    const res = await fetch(`${this.apiBase}/api-keys`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name: this.newKeyName })
+                    });
+                    if (res.ok) {
+                        this.newKeyName = '';
+                        this.fetchApiKeys();
+                    }
+                },
+
+                async deleteApiKey(id) {
+                    if(!confirm("确定要删除这个 Key 吗?")) return;
+                    const res = await fetch(`${this.apiBase}/api-keys/${id}`, { method: 'DELETE' });
+                    if(res.ok) this.fetchApiKeys();
                 }
             }
         }
