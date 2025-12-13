@@ -639,11 +639,11 @@ def _get_token_candidates():
 
 def _mark_token_error(token: Token, config: SystemConfig, reason: str):
     token.error_count = int(token.error_count or 0) + 1
-    token.remark = (reason or '')[:250]
+    token.remark = (reason or '')[:1000]
     threshold = int(getattr(config, 'error_ban_threshold', 3) or 3)
     if token.error_count >= threshold:
         token.is_active = False
-        token.remark = f"Auto-banned due to errors: {(reason or '')[:200]}"
+        token.remark = f"Auto-banned due to errors: {(reason or '')[:950]}"
     db.session.commit()
 
 def _mark_token_success(token: Token):

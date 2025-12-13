@@ -10,6 +10,8 @@
         .animate-slide-up{animation:slide-up .3s ease-out}
         .tab-active{border-bottom-color:hsl(0 0% 9%);color:hsl(0 0% 9%)}
         .tab-inactive{border-bottom-color:transparent;color:hsl(0 0% 45.1%)}
+        .remark-cell{max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:help}
+        .remark-cell:hover{background-color:hsl(0 0% 96.1%)}
     </style>
     <script>
         tailwind.config={theme:{extend:{colors:{border:"hsl(0 0% 89%)",input:"hsl(0 0% 89%)",ring:"hsl(0 0% 3.9%)",background:"hsl(0 0% 100%)",foreground:"hsl(0 0% 3.9%)",primary:{DEFAULT:"hsl(0 0% 9%)",foreground:"hsl(0 0% 98%)"},secondary:{DEFAULT:"hsl(0 0% 96.1%)",foreground:"hsl(0 0% 9%)"},muted:{DEFAULT:"hsl(0 0% 96.1%)",foreground:"hsl(0 0% 45.1%)"},destructive:{DEFAULT:"hsl(0 84.2% 60.2%)",foreground:"hsl(0 0% 98%)"}}}}}
@@ -76,7 +78,7 @@
                                 <th class="h-10 px-4 align-middle">剩余刷新时间</th>
                                 <th class="h-10 px-4 align-middle">类型</th>
                                 <th class="h-10 px-4 align-middle">错误</th>
-                                <th class="h-10 px-4 align-middle">备注</th>
+                                <th class="h-10 px-4 align-middle">备注 <small class="text-muted-foreground">(悬停查看完整内容)</small></th>
                                 <th class="h-10 px-4 align-middle text-right">操作</th>
                             </tr>
                         </thead>
@@ -290,7 +292,7 @@
                     <td class="px-4 py-2 text-xs">${remaining}</td>
                     <td class="px-4 py-2 text-xs">${t.user_paygate_tier === 'PAYGATE_TIER_NOT_PAID' ? '普通' : '会员'}</td>
                     <td class="px-4 py-2 text-xs">${t.error_count || 0}</td>
-                    <td class="px-4 py-2 text-xs text-muted-foreground">${t.remark || '-'}</td>
+                    <td class="px-4 py-2 text-xs text-muted-foreground remark-cell" title="${(t.remark || '-').replace(/"/g, '&quot;')}">${t.remark || '-'}</td>
                     <td class="px-4 py-2 text-right space-x-1">
                         <button onclick="refreshTokenAT(${t.id})" class="text-xs text-blue-600 hover:underline">更新</button>
                         <button onclick="toggleToken(${t.id}, ${t.is_active})" class="text-xs text-blue-600 hover:underline">${t.is_active ? '禁用' : '启用'}</button>
