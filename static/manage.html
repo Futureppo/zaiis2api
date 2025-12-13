@@ -76,9 +76,8 @@
                                 <th class="h-10 px-4 align-middle">状态</th>
                                 <th class="h-10 px-4 align-middle">zaitoken</th>
                                 <th class="h-10 px-4 align-middle">剩余刷新时间</th>
-                                <th class="h-10 px-4 align-middle">类型</th>
                                 <th class="h-10 px-4 align-middle">错误</th>
-                                <th class="h-10 px-4 align-middle">备注 <small class="text-muted-foreground">(悬停查看完整内容)</small></th>
+                                <th class="h-10 px-4 align-middle">刷新状态 <small class="text-muted-foreground">(悬停查看完整内容)</small></th>
                                 <th class="h-10 px-4 align-middle text-right">操作</th>
                             </tr>
                         </thead>
@@ -201,7 +200,7 @@
                 <textarea id="input-add-st" class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="输入 Discord Token"></textarea>
             </div>
                 <div class="space-y-2">
-                <label class="text-sm font-medium">备注 (可选)</label>
+                <label class="text-sm font-medium"> (可选)</label>
                 <input id="input-add-remark" class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm">
             </div>
             <div class="flex justify-end gap-2 pt-2">
@@ -305,7 +304,6 @@
                     <td class="px-4 py-2"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${t.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${t.is_active ? '活跃' : '禁用'}</span></td>
                     <td class="px-4 py-2 text-xs text-muted-foreground max-w-[150px] truncate" title="${t.zai_token || 'None'}">${t.zai_token ? '已获取' : '无'}</td>
                     <td class="px-4 py-2 text-xs" data-token-id="${t.id}">${remainingDisplay}</td>
-                    <td class="px-4 py-2 text-xs">${t.user_paygate_tier === 'PAYGATE_TIER_NOT_PAID' ? '普通' : '会员'}</td>
                     <td class="px-4 py-2 text-xs">${t.error_count || 0}</td>
                     <td class="px-4 py-2 text-xs text-muted-foreground remark-cell" title="${(t.remark || '-').replace(/"/g, '&quot;')}">${t.remark || '-'}</td>
                     <td class="px-4 py-2 text-right space-x-1">
