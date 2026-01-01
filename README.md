@@ -1,3 +1,5 @@
+> **注意**：因 zai.is 网站新增 `x-zai-darkknight` 请求头验证，当前版本的无头请求方式已失效。
+
 # Zai2API
 
 Zai2API 是一个功能完整的 OpenAI 兼容 API 服务网关。它允许你管理 Discord Token，自动将其转换为 zai.is 的访问凭证，并提供标准的 OpenAI 接口供第三方客户端调用。
@@ -52,7 +54,7 @@ docker-compose up -d
 pip install -r requirements.txt
 ```
 
-1. 启动服务：
+3. 启动服务：
 
 ```bash
 python app.py
@@ -68,29 +70,10 @@ python app.py
 | `SECRET_KEY` | `your-secret-key...` | Flask Session 密钥，建议修改 |
 | `TZ` | `Asia/Shanghai` | 容器时区 |
 
-## API 调用
-
-### 聊天
-
-**Endpoint**: `http://localhost:5000/v1/chat/completions`
-
-**示例 (curl)**:
-
-```bash
-curl http://localhost:5000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer sk-default-key" \
-  -d '{
-    "model": "gpt-4",
-    "messages": [{"role": "user", "content": "Hello!"}],
-    "stream": true
-  }'
-```
-
 ## 管理面板功能
 
 1. **Token 管理**：
-    - 点击“新增 Token”输入 Discord Token (Session Token)。
+    - 点击“新增 Token”输入 Discord Token。
     - 系统会自动尝试获取 Zai Token。
     - 点击“一键刷新 ZaiToken”可强制刷新所有 Token。
 2. **系统配置**：
